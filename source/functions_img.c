@@ -21,3 +21,15 @@ bool	img_cmp(const pixel_t *p1, const pixel_t *p2){
 		return false;
 	return true;
 }
+
+size_t	ppm_get_height(const ppm_image_t *img){
+	return img->height;
+}
+
+size_t	ppm_get_width(const ppm_image_t *img){
+	return img->width;
+}
+
+size_t	ppm_get_length(const ppm_image_t *img){
+	return img->length;
+}

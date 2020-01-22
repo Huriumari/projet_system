@@ -23,5 +23,12 @@ typedef struct	pixel_s
 	uint8_t	green;
 }				pixel_t;
 
+typedef struct	ppm_image_s
+{
+	size_t	height;
+	size_t	width;
+	pixel_t	*pixels;
+	size_t	length;
+}				ppm_image_t;
 
 #endif

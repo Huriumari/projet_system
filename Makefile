@@ -2,16 +2,15 @@
 NAME = superpixmanip
 PATH_SRC = ./source/
 HEADER = ./include/
-FLAG = -Wall -Wextra -Werror -pthread
+FLAG = -std=c11 -Wall -Wextra -Werror -pthread
 SRC = $(PATH_SRC)main.c  $(PATH_SRC)functions_img.c
 OBJ = main.o
-LIB = -std=c11
 
 
 all: $(NAME)
 
 $(NAME):
-	gcc-8 $(FLAG) -I $(HEADER) $(SRC) -o $(NAME) $(LIB)
+	gcc-8 $(FLAG) -I $(HEADER) $(SRC) -o $(NAME)
 
 clean:
 	rm -f $(OBJ)
