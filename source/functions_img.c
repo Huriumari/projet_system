@@ -22,14 +22,18 @@ bool	img_cmp(const pixel_t *p1, const pixel_t *p2){
 	return true;
 }
 
-size_t	ppm_get_height(const ppm_image_t *img){
+size_t	ppm_height(const ppm_image_t *img){
 	return img->height;
 }
 
-size_t	ppm_get_width(const ppm_image_t *img){
+size_t	ppm_width(const ppm_image_t *img){
 	return img->width;
 }
 
-size_t	ppm_get_length(const ppm_image_t *img){
+size_t	ppm_length(const ppm_image_t *img){
 	return img->length;
+}
+
+pixel_t	ppm_pixel(const ppm_image_t *img, const size_t i, const size_t j){
+	return img->pixels[i * (img->height) + j];
 }
