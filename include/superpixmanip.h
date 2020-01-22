@@ -9,7 +9,7 @@ typedef struct	pixel_s
 	uint8_t	red;
 	uint8_t	blue;
 	uint8_t	green;
-}				pixel_f;
+}				pixel_t;
 
 
 #endif

@@ -3,7 +3,7 @@ NAME = superpixmanip
 PATH_SRC = ./source/
 HEADER = ./include/
 FLAG = -Wall -Wextra -Werror -pthread
-SRC = $(PATH_SRC)main.c
+SRC = $(PATH_SRC)main.c  $(PATH_SRC)functions_img.c
 OBJ = main.o
 LIB = -std=c11
 
