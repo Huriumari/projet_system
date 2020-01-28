@@ -34,6 +34,108 @@ size_t	ppm_length(const ppm_image_t *img){
 	return img->length;
 }
 
-pixel_t	ppm_pixel(const ppm_image_t *img, const size_t i, const size_t j){
-	return img->pixels[i * (img->height) + j];
+pixel_t	*ppm_pixel(const ppm_image_t *img, const size_t i, const size_t j){
+	return &(img->pixels[i * (img->height) + j]);
+}
+
+void	skip_comment(char **line, size_t *n, FILE *fd){
+	while(getline(line, n, fd), !feof(fd) && **line == '#'){
+		free(*line);
+		line = NULL;
+		n = 0;
+	}
+}
+
+void	get_new_line(char **line, size_t *n, FILE *fd){
+	free(*line);
+	*n = 0;
+	*line = NULL;
+	skip_comment(line, n, fd);
+}
+
+void	ppm_put_header(FILE *fd, ppm_image_t *img){
+	char	*line;
+	size_t	n,i,j;
+	char	buffer[10];
+
+	line = NULL;
+	n = 0;
+	i = 2;
+	j = 0;
+	skip_comment(&line, &n, fd);
+
+	line[i] = '\0';
+	strcpy(img->magic_number,line);
+	if (i >= strlen(line)){
+		i = 0;
+		get_new_line(&line, &n, fd);
+	}
+
+	while(isdigit(line[i+j])){
+		buffer[j] = line[i+j];
+		j++;
+	}
+	buffer[j] = '\0';
+	img->width = (size_t)atoi(buffer);
+	i = j + i + 1;
+
+	j = 0;
+	if (i >= strlen(line)){
+		i = 0;
+		get_new_line(&line, &n, fd);
+	}
+	while(isdigit(line[i+j])){
+		buffer[j] = line[i+j];
+		j++;
+	}
+	buffer[j] = '\0';
+	img->height = (size_t)atoi(buffer);
+
+	img->length = img->width * img->height;
+	if (line[i + j + 1] == '\0' && !strcmp(img->magic_number,"P6")){
+		get_new_line(&line, &n, fd);
+	}
+	free(line);
+}
+
+int		ppm_put_data(FILE *fd, ppm_image_t *img){
+	size_t	i,j,size;
+	pixel_t	*pixel;
+	char	*buffer;
+
+	size = img->width*3;
+	buffer = (char*)malloc(sizeof(char)*size + 1);
+	buffer[size] = '\0';
+	img->pixels = (pixel_t*)malloc(sizeof(pixel_t) * img->length);
+	if (img->pixels == NULL){
+		printf("Error: failed to alloc memory.\n");
+	}
+	if (strcmp(img->magic_number,"P6")){
+		printf("error: image is in the wrong format.\n");
+	}
+	for (i = 0; fgets(buffer,size + 1, fd), i < img->height && !feof(fd); i++){
+		for (j = 0; j < size; j++){
+			pixel = ppm_pixel(img,i,j);
+			pixel->red = buffer[3*j];
+			pixel->green = buffer[3*j+1];
+			pixel->blue = buffer[3*j+2];
+		}
+	}
+	return 1;
+}
+
+ppm_image_t	*ppm_new(const char *path){
+	ppm_image_t	*img;
+	FILE		*fd;
+
+	img = malloc(sizeof(ppm_image_t));
+	if (img == NULL)
+		return NULL;
+	fd = fopen(path, "rb");
+	if (fd == NULL)
+		return NULL;
+	ppm_put_header(fd,img);
+	ppm_put_data(fd,img);
+	fclose(fd);
+	return img;
 }
