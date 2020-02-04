@@ -101,26 +101,63 @@ void	ppm_put_header(FILE *fd, ppm_image_t *img){
 int		ppm_put_data(FILE *fd, ppm_image_t *img){
 	size_t	i,j,size;
 	pixel_t	*pixel;
-	char	*buffer;
+	char	*buffer, *ptr_start, *ptr_end;
 
-	size = img->width*3;
-	buffer = (char*)malloc(sizeof(char)*size + 1);
-	buffer[size] = '\0';
+	
 	img->pixels = (pixel_t*)malloc(sizeof(pixel_t) * img->length);
 	if (img->pixels == NULL){
 		printf("Error: failed to alloc memory.\n");
 	}
-	if (strcmp(img->magic_number,"P6")){
-		printf("error: image is in the wrong format.\n");
-	}
-	for (i = 0; fgets(buffer,size + 1, fd), i < img->height && !feof(fd); i++){
-		for (j = 0; j < size; j++){
-			pixel = ppm_pixel(img,i,j);
-			pixel->red = buffer[3*j];
-			pixel->green = buffer[3*j+1];
-			pixel->blue = buffer[3*j+2];
+	if (!strcmp(img->magic_number,"P6")){
+		size = img->width*3;
+		buffer = (char*)malloc(sizeof(char)*size + 1);
+		buffer[size] = '\0';
+		for (i = 0; fgets(buffer,size + 1, fd), i < img->height && !feof(fd); i++){
+			for (j = 0; j < size; j++){
+				pixel = ppm_pixel(img,i,j);
+				pixel->red = buffer[3*j];
+				pixel->green = buffer[3*j+1];
+				pixel->blue = buffer[3*j+2];
+			}
+		}
+	}else{
+		buffer = malloc(sizeof(char) * 20);
+		for(i = 0 ; i < img->length ; i++){
+			fread(buffer, 20, sizeof(char), fd);
+			ptr_start = buffer;
+			pixel = &(img->pixels[i]);
+
+			while(isspace(*ptr_start))
+				ptr_start++;
+			ptr_end = ptr_start;
+			while(isdigit(*ptr_end))
+				ptr_end++;
+			*ptr_end = '\0';
+			pixel->red = atoi(ptr_start);
+
+			ptr_start = ptr_end+1;
+			while(isspace(*ptr_start))
+				ptr_start++;
+			ptr_end = ptr_start;
+			while(isdigit(*ptr_end))
+				ptr_end++;
+			*ptr_end = '\0';
+			pixel->green = atoi(ptr_start);
+
+			ptr_start = ptr_end+1;
+			while(isspace(*ptr_start))
+				ptr_start++;
+			ptr_end = ptr_start;
+			while(isdigit(*ptr_end))
+				ptr_end++;
+			*ptr_end = '\0';
+			pixel->blue = atoi(ptr_start);
+
+			ptr_start = ptr_end + 1;
+			fseek(fd, -strlen(ptr_start), SEEK_CUR);
 		}
 	}
+	free(buffer);
 	return 1;
 }
 
