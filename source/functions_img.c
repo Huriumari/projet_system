@@ -46,6 +46,10 @@ void	skip_comment(char **line, size_t *n, FILE *fd){
 	}
 }
 
+void	print_pixel(pixel_t pixel, size_t i){
+	printf("pixel numero: %lu\nblue: %d\tgreen: %d\tred: %d\n",i, (int)pixel.blue, (int)pixel.green, (int)pixel.red);
+}
+
 void	get_new_line(char **line, size_t *n, FILE *fd){
 	free(*line);
 	*n = 0;
@@ -118,6 +122,7 @@ int		ppm_put_data(FILE *fd, ppm_image_t *img){
 				pixel->red = buffer[3*j];
 				pixel->green = buffer[3*j+1];
 				pixel->blue = buffer[3*j+2];
+				print_pixel(*pixel, 3*j);
 			}
 		}
 	}else{
@@ -153,6 +158,7 @@ int		ppm_put_data(FILE *fd, ppm_image_t *img){
 			*ptr_end = '\0';
 			pixel->blue = atoi(ptr_start);
 
+			print_pixel(*pixel,i);
 			ptr_start = ptr_end + 1;
 			fseek(fd, -strlen(ptr_start), SEEK_CUR);
 		}
